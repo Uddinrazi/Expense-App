@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section>
+    
+        
+            <form id="my-form" onsubmit="saveToLocalStorage(event)"> 
+            <label for="amount">Choose amount: </label> 
+            <input type="text" id="amount" ><br>
+            <label for="disp">Choose discription: </label>
+            <input type="text" id="disp"><br>
+            <label for="categry">Choose Category: </label>
+            <select id="change">
+                <option> movie</option>
+                <option>food</option>
+                <option>fuel</option>  
+            </select>
+            <input class="btn" type="submit"   value="Add Expnse">
+           
+            </form>
+            <ul id="details"></ul>
+            
+            
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+
+    <script>
+    async function xpenseManager(event){
+        try{
+        event.preventDefault();
+
+        const amt = document.getElementById('amount')
+        const discreption = document.getElementById('disp');
+        const option = document.getElementById('change');
+
+        const obj1 = {
+            amt: amt.value, 
+            discreption: descreption.value, 
+            option: option.value 
+        }
+        console.log(obj1)
+        console.log('RUNNN')
+        let response = await axios.post("http://localhost:4000/expense/add-expense",obj)
+        console.log(response)
+        showDetailOnScreen(response.data.newDetails);//why the function of this written after bracket
+    }
+    catch(err) {
+        console.log(err)
+        document.body.innerHTML = document.body.innerHTML + '<h3> Some thing went wrong </h3>'
+    }
+}
+
+    window.addEventListener('DOMContentLoaded', async() => {
+        try{
+            let response = await axios.get("http://localhost:4000/expense/get-expense")
+            for(let i=0; i< response.data.totalXpense.length; i++){
+                showDetailOnScreen(response.data.totalXpense[i]) 
+            }
+        }
+        catch(err){
+            console.log(err)
+        }
+    })
+
+    function showDetailOnScreen(obj1){
+        const parentEle = document.getElementById('details');
+        const childele = document.createElement('li');
+        console.log(childele);
+        childele.textContent = obj1.amt+ '  ' + obj1.discreption + '  '+ obj1.option;
+        
+        parentEle.appendChild(childele);
+
+        var dbtn = document.createElement('input');
+        dbtn.type ='button';
+        dbtn.value ='Delete';
+        dbtn.id = 'btn1';
+
+      /*  dbtn.onclick = () => {
+            localStorage.removeItem(obj1.discreption);
+            parentEle.removeChild(childele);
+
+        }*/
+        async function deleteXpense(id){
+            try{
+                await axios.delete(`http://localhost:4000/expense/delete-expense/${id}`)
+                removeFromScreen(id)
+            }
+            catch(err){
+                console.log(err)
+            }
+        }
+
+        function removeFromScreen(id){
+        const parentNode = document.getElementById('change');
+        const childNodeDeleted = document.getElementById(id);
+        if(childNodeDeleted){
+          parentNode.removeChild(childNodeDeleted)
+        }
+      }
+        //childele.appendChild(dbtn);
+
+        var ebtn = document.createElement('input');
+        ebtn.type = 'button';
+        ebtn.value = 'Edit';
+        ebtn.id = 'edit1';
+
+        ebtn.onclick = () => {
+            localStorage.removeItem(obj1.discreption);
+            document.getElementById('amount').value = obj1.amt;
+            document.getElementById('disp').value = obj1.discreption;
+            document.getElementById('change').value = obj1.option;
+        }
+        childele.appendChild(ebtn);
+    }
+    </script>
+</body>
+</html>
