@@ -1,8 +1,9 @@
 const Tracker = require('../models/tracker');
 
 const getXpenseData = async(req, res, next) => {
-    console.log('RUNNN')
+    
     try{
+        console.log('RUNNN  line 6')
     const allExpence = await Tracker.findAll()
     res.status(200).json({totalXpense: allExpence})
     }
@@ -12,12 +13,9 @@ const getXpenseData = async(req, res, next) => {
 }
 
 const postXpenseData = async(req, res, next) => {
+    console.log('Run line 16')
     try{
-    const amt = req.body.amt;
-    const desp = req.body.description;
-    const option = req.body.option;
-
-    const data = await Tracker.create({amt: amt, desp: desp, option: option})
+    const data = await Tracker.create(req.body)
     res.status(201).json({newDetails: data})
     }
     catch(err) {
@@ -26,6 +24,7 @@ const postXpenseData = async(req, res, next) => {
 }
 
 const deleteData = async(req, res, next) => {
+    
     try{
     if(req.params.id === 'undefined'){
         console.log('ID is missing')
@@ -33,6 +32,8 @@ const deleteData = async(req, res, next) => {
     }
 
     const xpensId = req.params.id;
+    console.log(xpensId)
+    console.log('line 35')
     await Tracker.destroy({where: {id: xpensId}})
     res.sendStatus(200)
 }
